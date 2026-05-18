@@ -37,14 +37,14 @@ const translations = {
     compatIndexLabel: 'COMPATIBILITY INDEX',
     closingPhrase: 'ودائماً نقول العلم عند الله وحده، أتمنى لكم حياة مليئة بالوُد و الإحترام.',
     paywallText: 'كيف تعالجون علاقتكم؟ وكيف عملت الخوارزمية؟ افتحوا القسم المميز!',
-    subscribeBtnText: 'اكشفي السر مقابل 2$ USDT',
+    subscribeBtnText: 'اكشفي السر مقابل 2$',
     calcTabBtn: 'طريقة الحساب',
     healTabBtn: 'دليل الشفاء العاطفي 🌿',
     shareBtn: 'مشاركة النتيجة',
     paymentTitle: 'اشتراك البصيرة السرية',
-    paymentDesc: 'لفتح قسم "طريقة الحساب" و"دليل الشفاء العاطفي"، يرجى تحويل 2$ USDT إلى:',
-    paymentNote: 'بعد التحويل، اضغطي الزر أدناه وأرسلي إثبات الدفع عبر الواتساب ليتم فتح القسم لكِ فوراً.',
-    confirmPaymentText: 'لقد قمت بالتحويل',
+    paymentDesc: 'لفتح قسم "طريقة الحساب" و"دليل الشفاء العاطفي"، يرجى الدفع عبر بوابة Spaceremit:',
+    paymentNote: 'بعد الدفع، سيتم فتح القسم المميز لكِ تلقائياً.',
+    confirmPaymentText: 'لقد قمت بالدفع',
     closeModalBtn: 'إغلاق',
     waTooltip: 'تواصل معنا',
     alertFillFields: 'يرجى ملء جميع الحقول',
@@ -79,14 +79,14 @@ const translations = {
     compatIndexLabel: 'COMPATIBILITY INDEX',
     closingPhrase: 'Remember, knowledge belongs to God alone. We wish you a life full of affection and respect.',
     paywallText: 'How do you treat your relationship? How does the algorithm work? Unlock the premium section!',
-    subscribeBtnText: 'Reveal the Secret for $2 USDT',
+    subscribeBtnText: 'Reveal the Secret for $2',
     calcTabBtn: 'Calculation Method',
     healTabBtn: 'Emotional Healing Guide 🌿',
     shareBtn: 'Share Result',
     paymentTitle: 'Secret Insight Subscription',
-    paymentDesc: 'To unlock "Calculation Method" and "Emotional Healing Guide", please transfer $2 USDT to:',
-    paymentNote: 'After transfer, click the button below and send proof of payment via WhatsApp to unlock the section immediately.',
-    confirmPaymentText: 'I Have Transferred',
+    paymentDesc: 'To unlock "Calculation Method" and "Emotional Healing Guide", please pay via Spaceremit gateway:',
+    paymentNote: 'After payment, the premium section will be unlocked automatically.',
+    confirmPaymentText: 'I Have Paid',
     closeModalBtn: 'Close',
     waTooltip: 'Contact Us',
     alertFillFields: 'Please fill all fields',
@@ -184,7 +184,6 @@ export default function Home() {
   const [resultNumber, setResultNumber] = useState(0)
   const [activeTab, setActiveTab] = useState<'calc' | 'heal'>('calc')
   const [showModal, setShowModal] = useState(false)
-  const [showCopied, setShowCopied] = useState(false)
   const [premiumUnlocked, setPremiumUnlocked] = useState(() => {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('premium_unlocked') === 'true'
@@ -284,12 +283,6 @@ export default function Home() {
       setLoading(false)
     }, 1500)
   }, [name1, name2, day1, month1, year1, day2, month2, year2, t])
-
-  const copyWallet = useCallback(() => {
-    navigator.clipboard.writeText('TXrk4Y2BE2wVj9sKu8g6bF3R9nHmWv2ZxA')
-    setShowCopied(true)
-    setTimeout(() => setShowCopied(false), 2000)
-  }, [])
 
   const shareResult = useCallback(() => {
     const text = t.shareText(name1, name2, resultNumber)
@@ -595,7 +588,6 @@ export default function Home() {
               🔑 SPACEREMIT PAYMENT FORM
               This form integrates with Spaceremit payment gateway.
               When SP_PUBLIC_KEY is set, it will show Spaceremit payment options.
-              Currently shows USDT wallet as fallback until the key is provided.
               ============================================ */}
           <form id="spaceremit-form" style={{ width: '100%' }}>
             {/* Spaceremit Local Payment Methods Container */}
@@ -603,34 +595,6 @@ export default function Home() {
 
             {/* Spaceremit Card Payment Container */}
             <div id="spaceremit-card-pay" style={{ marginBottom: '1rem' }}></div>
-
-            {/* 
-              ⚠️ TEMPORARY: USDT Wallet Section
-              This section will be REMOVED once the SP_PUBLIC_KEY is provided.
-              It serves as a fallback payment method until Spaceremit is fully configured.
-            */}
-            <div style={{
-              borderTop: '1px solid rgba(201, 151, 46, 0.3)',
-              paddingTop: '1rem',
-              marginTop: '1rem'
-            }}>
-              <p style={{ fontSize: '0.9rem', marginBottom: '1rem', color: 'var(--text-muted)' }}>
-                {currentLang === 'ar' ? 'أو ادفعي عبر USDT:' : 'Or pay via USDT:'}
-              </p>
-              <div className="wallet-address" onClick={copyWallet}>
-                <span>TXrk4Y2BE2wVj9sKu8g6bF3R9nHmWv2ZxA</span>
-                <i className="fas fa-copy" style={{ position: 'absolute', top: '10px', left: '10px', color: 'var(--text-muted)' }}></i>
-              </div>
-              <div className={`copied-msg ${showCopied ? 'show' : ''}`}>COPIED TO CLIPBOARD!</div>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '1rem' }}>{t.paymentNote}</p>
-              <a
-                href="https://wa.me/966XXXXXXXXX?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85"
-                target="_blank"
-                className="btn-action"
-              >
-                <i className="fab fa-whatsapp"></i> {t.confirmPaymentText}
-              </a>
-            </div>
           </form>
 
           <br />

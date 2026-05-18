@@ -221,19 +221,6 @@ input:focus { outline: none; border-color: var(--neon-cyan); box-shadow: 0 0 15p
   background: var(--forest-dark); border: 1px solid var(--amber); border-radius: 10px; padding: 2rem;
   width: 90%; max-width: 400px; text-align: center; box-shadow: 0 0 30px rgba(201, 151, 46, 0.2);
 }
-.wallet-address {
-  background: rgba(0,0,0,0.8); padding: 1rem; border-radius: 5px; word-break: break-all; color: var(--amber);
-  font-family: 'Orbitron', sans-serif; font-size: 0.8rem; margin: 1rem 0; cursor: pointer; position: relative; border: 1px solid rgba(201, 151, 46, 0.3);
-}
-.copied-msg { display: none; color: var(--neon-cyan); font-size: 0.8rem; margin-top: 0.5rem; font-family: 'Orbitron', sans-serif; }
-.copied-msg.show { display: block; }
-
-.btn-action {
-  background: rgba(0, 255, 200, 0.1); border: 1px dashed var(--neon-cyan); color: var(--neon-cyan);
-  padding: 0.5rem 1rem; margin-top: 1rem; border-radius: 5px; cursor: pointer; font-family: 'Cairo', sans-serif; font-size: 0.9rem;
-  transition: 0.3s; text-decoration: none; display: inline-block;
-}
-.btn-action:hover { background: var(--neon-cyan); color: var(--forest-dark); }
 
 /* WhatsApp Floating Button */
 .whatsapp-float {
