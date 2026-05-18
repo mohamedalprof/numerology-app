@@ -239,6 +239,25 @@ export default function Home() {
     const html = document.documentElement
     html.setAttribute('lang', newLang)
     html.setAttribute('dir', newLang === 'ar' ? 'rtl' : 'ltr')
+
+    // Reinitialize Spaceremit form when language changes
+    // This ensures payment options (including wallet) render correctly in both languages
+    if (typeof window !== 'undefined' && (window as any).SpaceremitPay) {
+      try {
+        const localContainer = document.getElementById('spaceremit-local-methods-pay')
+        const cardContainer = document.getElementById('spaceremit-card-pay')
+        if (localContainer) localContainer.innerHTML = ''
+        if (cardContainer) cardContainer.innerHTML = ''
+        // Re-initialize Spaceremit SDK after a short delay
+        setTimeout(() => {
+          if (typeof (window as any).SpaceremitPay === 'function') {
+            ;(window as any).SpaceremitPay()
+          }
+        }, 300)
+      } catch (e) {
+        console.log('Spaceremit re-init after language change:', e)
+      }
+    }
   }, [currentLang])
 
   // Calculation functions imported from @/lib/numerology
@@ -292,6 +311,17 @@ export default function Home() {
 
   const handleSubscribe = useCallback(() => {
     setShowModal(true)
+    // Initialize Spaceremit form when modal opens
+    // This ensures the wallet option and other payment methods render correctly
+    setTimeout(() => {
+      if (typeof window !== 'undefined' && typeof (window as any).SpaceremitPay === 'function') {
+        try {
+          ;(window as any).SpaceremitPay()
+        } catch (e) {
+          console.log('Spaceremit init on modal open:', e)
+        }
+      }
+    }, 500)
   }, [])
 
   const category = getCategory(resultNumber)
