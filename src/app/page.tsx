@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback, useEffect } from 'react'
+import { sumDigits, reduceNumber, getCategory, POSITIVE_NUMBERS, NEGATIVE_NUMBERS, MEDIUM_NUMBERS } from '@/lib/numerology'
 
 // ============================================
 // 🔑 SPACEREMIT CONFIGURATION
@@ -130,15 +131,7 @@ const interpretations: Record<number, string> = {
   22: "علاقة غير متوقعة جداً، العطش للحرية، قد يكون شريكك رجلاً غير عادي جداً. هذا البركان الذي يمكن أن ينفجر في أي لحظة بسبب التراكمات، أنتم بحاجة إلى العمل الجاد لجعل هذه العلاقات سلسة وهادئة. من المرجح أن يكون المصير الطلاق."
 }
 
-// ============================================
-// تصنيف الأرقام حسب المصدر
-// الأرقام الأكثر ملاءمة: 2، 3، 5، 6، 10، 14، 17، 19، 21
-// أرقام سلبية: 9، 12، 13، 15، 16، 18، 22
-// أرقام متوسطة: 1، 4، 7، 8، 11، 20
-// ============================================
-const POSITIVE_NUMBERS = [2, 3, 5, 6, 10, 14, 17, 19, 21]
-const NEGATIVE_NUMBERS = [9, 12, 13, 15, 16, 18, 22]
-const MEDIUM_NUMBERS = [1, 4, 7, 8, 11, 20]
+// Classification constants imported from @/lib/numerology
 
 const healingGuides: Record<number, string> = {
   1: "حاول ألا تتدخل في مسألة القيادة. ركزي على الإبداع وبناء شراكة متساوية. قد تكونوا خاطب/مخطوبة في العمل المشترك.",
@@ -248,23 +241,8 @@ export default function Home() {
     html.setAttribute('dir', newLang === 'ar' ? 'rtl' : 'ltr')
   }, [currentLang])
 
-  const sumDigits = (num: number): number => {
-    return String(num).split('').reduce((sum, digit) => sum + parseInt(digit), 0)
-  }
-
-  const reduceNumber = (num: number): number => {
-    // في علم الأرقام، إذا كان الناتج 0 فهو يعادل 22 (الرقم الرئيسي)
-    while (num >= 22) {
-      num -= 22
-    }
-    return num === 0 ? 22 : num
-  }
-
-  const getCategory = (compatibility: number) => {
-    if (POSITIVE_NUMBERS.includes(compatibility)) return 'positive'
-    if (NEGATIVE_NUMBERS.includes(compatibility)) return 'negative'
-    return 'medium'
-  }
+  // Calculation functions imported from @/lib/numerology
+  // sumDigits, reduceNumber, getCategory are now shared between page and tests
 
   const getBadgeText = (category: string) => {
     if (category === 'positive') return t.positiveBadge
