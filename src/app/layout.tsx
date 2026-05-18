@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import Script from "next/script";
 
 export const metadata: Metadata = {
   title: "أعداد وبصيرة | AI Numerology",
@@ -26,6 +27,11 @@ export default function RootLayout({
       </head>
       <body>
         {children}
+        {/* Spaceremit Payment Gateway Script */}
+        <Script
+          src="https://spaceremit.com/api/v2/js_script/spaceremit.js"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );

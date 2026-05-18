@@ -1,6 +1,20 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
+
+// ============================================
+// 🔑 SPACEREMIT CONFIGURATION
+// ⚠️ استبدل YOUR_PUBLIC_KEY بالمفتاح العام الذي ستصلك من Spaceremit
+// ============================================
+const SP_PUBLIC_KEY = "YOUR_PUBLIC_KEY"; // ← ضع المفتاح العام هنا
+const SP_FORM_ID = "#spaceremit-form";
+const SP_SELECT_RADIO_NAME = "sp-pay-type-radio";
+const LOCAL_METHODS_BOX_STATUS = true;
+const LOCAL_METHODS_PARENT_ID = "#spaceremit-local-methods-pay";
+const CARD_BOX_STATUS = true;
+const CARD_BOX_PARENT_ID = "#spaceremit-card-pay";
+let SP_FORM_AUTO_SUBMIT_WHEN_GET_CODE = true;
+// ============================================
 
 const translations = {
   ar: {
@@ -40,6 +54,10 @@ const translations = {
     negativeBadge: '✗ توافق سلبي',
     shareText: (name1: string, name2: string, result: number) =>
       `أنا و ${name2} لدينا مؤشر توافق ${result} 💕 جرب أنت أيضاً على أعداد وبصيرة!`,
+    paymentSuccessTitle: 'تم الدفع بنجاح!',
+    paymentSuccessMsg: 'تم فتح القسم المميز لكِ. استمتعي بالبصيرة السرية!',
+    paymentFailTitle: 'فشل الدفع',
+    paymentFailMsg: 'لم يتم إتمام عملية الدفع. يرجى المحاولة مرة أخرى.',
   },
   en: {
     langToggle: 'العربية',
@@ -78,6 +96,10 @@ const translations = {
     negativeBadge: '✗ Negative Compatibility',
     shareText: (name1: string, name2: string, result: number) =>
       `${name1} and ${name2} have a compatibility index of ${result} 💕 Try it too on Numbers & Insight!`,
+    paymentSuccessTitle: 'Payment Successful!',
+    paymentSuccessMsg: 'Premium section unlocked. Enjoy the secret insight!',
+    paymentFailTitle: 'Payment Failed',
+    paymentFailMsg: 'Payment was not completed. Please try again.',
   }
 }
 
@@ -129,6 +151,19 @@ const healingGuides: Record<number, string> = {
   21: "احتفلي بهذا الحب المثالي. ركزي على الحفاظ على هذا الانسجام والسعادة. هذه علاقة نادرة وخاصة جداً."
 }
 
+// ============================================
+// Spaceremit Callback Functions (Global)
+// These must be on window for the Spaceremit SDK to call them
+// ============================================
+declare global {
+  interface Window {
+    SP_SUCCESSFUL_PAYMENT: (code: string) => void;
+    SP_FAILD_PAYMENT: () => void;
+    SP_RECIVED_MESSAGE: (message: string) => void;
+    SP_NEED_AUTH: (targetAuthLink: string) => void;
+  }
+}
+
 export default function Home() {
   const [currentLang, setCurrentLang] = useState<'ar' | 'en'>(() => {
     if (typeof window !== 'undefined') {
@@ -150,9 +185,46 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<'calc' | 'heal'>('calc')
   const [showModal, setShowModal] = useState(false)
   const [showCopied, setShowCopied] = useState(false)
-  const [premiumUnlocked, setPremiumUnlocked] = useState(false)
+  const [premiumUnlocked, setPremiumUnlocked] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('premium_unlocked') === 'true'
+    }
+    return false
+  })
+  const [paymentStatus, setPaymentStatus] = useState<'idle' | 'success' | 'failed'>('idle')
 
   const t = translations[currentLang]
+
+  // ============================================
+  // Setup Spaceremit callbacks on window
+  // ============================================
+  useEffect(() => {
+    // Spaceremit SDK callback: successful payment
+    window.SP_SUCCESSFUL_PAYMENT = (spaceremit_code: string) => {
+      console.log('Spaceremit payment successful:', spaceremit_code)
+      setPremiumUnlocked(true)
+      setPaymentStatus('success')
+      setShowModal(false)
+      localStorage.setItem('premium_unlocked', 'true')
+      localStorage.setItem('spaceremit_code', spaceremit_code)
+    }
+
+    // Spaceremit SDK callback: failed payment
+    window.SP_FAILD_PAYMENT = () => {
+      console.log('Spaceremit payment failed')
+      setPaymentStatus('failed')
+    }
+
+    // Spaceremit SDK callback: received message
+    window.SP_RECIVED_MESSAGE = (message: string) => {
+      alert(message)
+    }
+
+    // Spaceremit SDK callback: needs authentication
+    window.SP_NEED_AUTH = (target_auth_link: string) => {
+      window.open(target_auth_link, '_blank')
+    }
+  }, [])
 
   const toggleLanguage = useCallback(() => {
     const newLang = currentLang === 'ar' ? 'en' : 'ar'
@@ -232,11 +304,31 @@ export default function Home() {
     }
   }, [t, name1, name2, resultNumber, currentLang])
 
+  const handleSubscribe = useCallback(() => {
+    setShowModal(true)
+  }, [])
+
   const category = getCategory(resultNumber)
   const badgeText = getBadgeText(category)
 
   return (
     <>
+      {/* Spaceremit Configuration Script */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+            const SP_PUBLIC_KEY = "${SP_PUBLIC_KEY}";
+            const SP_FORM_ID = "${SP_FORM_ID}";
+            const SP_SELECT_RADIO_NAME = "${SP_SELECT_RADIO_NAME}";
+            const LOCAL_METHODS_BOX_STATUS = ${LOCAL_METHODS_BOX_STATUS};
+            const LOCAL_METHODS_PARENT_ID = "${LOCAL_METHODS_PARENT_ID}";
+            const CARD_BOX_STATUS = ${CARD_BOX_STATUS};
+            const CARD_BOX_PARENT_ID = "${CARD_BOX_PARENT_ID}";
+            let SP_FORM_AUTO_SUBMIT_WHEN_GET_CODE = ${SP_FORM_AUTO_SUBMIT_WHEN_GET_CODE};
+          `
+        }}
+      />
+
       {/* Background */}
       <div className="bg-animation">
         <div className="digital-grid"></div>
@@ -401,13 +493,51 @@ export default function Home() {
                 </div>
                 <div className="closing-phrase">{t.closingPhrase}</div>
 
+                {/* Payment Success/Fail Messages */}
+                {paymentStatus === 'success' && (
+                  <div style={{
+                    background: 'rgba(0, 255, 200, 0.15)',
+                    border: '1px solid var(--neon-cyan)',
+                    borderRadius: '10px',
+                    padding: '1rem',
+                    marginBottom: '1.5rem',
+                    textAlign: 'center'
+                  }}>
+                    <i className="fas fa-check-circle" style={{ color: 'var(--neon-cyan)', fontSize: '2rem' }}></i>
+                    <p style={{ color: 'var(--neon-cyan)', marginTop: '0.5rem', fontWeight: 'bold' }}>
+                      {t.paymentSuccessTitle}
+                    </p>
+                    <p style={{ color: 'var(--text-light)', fontSize: '0.9rem' }}>
+                      {t.paymentSuccessMsg}
+                    </p>
+                  </div>
+                )}
+                {paymentStatus === 'failed' && (
+                  <div style={{
+                    background: 'rgba(90, 30, 20, 0.4)',
+                    border: '1px solid var(--negative-border)',
+                    borderRadius: '10px',
+                    padding: '1rem',
+                    marginBottom: '1.5rem',
+                    textAlign: 'center'
+                  }}>
+                    <i className="fas fa-times-circle" style={{ color: 'var(--negative-text)', fontSize: '2rem' }}></i>
+                    <p style={{ color: 'var(--negative-text)', marginTop: '0.5rem', fontWeight: 'bold' }}>
+                      {t.paymentFailTitle}
+                    </p>
+                    <p style={{ color: 'var(--text-light)', fontSize: '0.9rem' }}>
+                      {t.paymentFailMsg}
+                    </p>
+                  </div>
+                )}
+
                 {/* Premium Section */}
                 <div className={`paywall-section ${premiumUnlocked ? 'premium-unlocked' : ''}`}>
                   {!premiumUnlocked && (
                     <div className="paywall-overlay">
                       <i className="fas fa-lock lock-icon"></i>
                       <div className="paywall-text">{t.paywallText}</div>
-                      <button className="btn-subscribe" onClick={() => setShowModal(true)}>
+                      <button className="btn-subscribe" onClick={handleSubscribe}>
                         {t.subscribeBtnText}
                       </button>
                     </div>
@@ -454,29 +584,55 @@ export default function Home() {
         )}
       </main>
 
-      {/* Payment Modal */}
+      {/* Payment Modal with Spaceremit Form */}
       <div className={`modal-bg ${showModal ? 'active' : ''}`} onClick={(e) => {
         if (e.target === e.currentTarget) setShowModal(false)
       }}>
         <div className="modal-content">
           <h3 style={{ color: 'var(--amber)', marginBottom: '1rem' }}>{t.paymentTitle}</h3>
-          <p style={{ fontSize: '0.9rem', marginBottom: '1.5rem' }}>{t.paymentDesc}</p>
 
-          <div className="wallet-address" onClick={copyWallet}>
-            <span>TXrk4Y2BE2wVj9sKu8g6bF3R9nHmWv2ZxA</span>
-            <i className="fas fa-copy" style={{ position: 'absolute', top: '10px', left: '10px', color: 'var(--text-muted)' }}></i>
-          </div>
-          <div className={`copied-msg ${showCopied ? 'show' : ''}`}>COPIED TO CLIPBOARD!</div>
+          {/* ============================================
+              🔑 SPACEREMIT PAYMENT FORM
+              This form integrates with Spaceremit payment gateway.
+              When SP_PUBLIC_KEY is set, it will show Spaceremit payment options.
+              Currently shows USDT wallet as fallback until the key is provided.
+              ============================================ */}
+          <form id="spaceremit-form" style={{ width: '100%' }}>
+            {/* Spaceremit Local Payment Methods Container */}
+            <div id="spaceremit-local-methods-pay" style={{ marginBottom: '1rem' }}></div>
 
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '1rem' }}>{t.paymentNote}</p>
+            {/* Spaceremit Card Payment Container */}
+            <div id="spaceremit-card-pay" style={{ marginBottom: '1rem' }}></div>
 
-          <a
-            href="https://wa.me/966XXXXXXXXX?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85"
-            target="_blank"
-            className="btn-action"
-          >
-            <i className="fab fa-whatsapp"></i> {t.confirmPaymentText}
-          </a>
+            {/* 
+              ⚠️ TEMPORARY: USDT Wallet Section
+              This section will be REMOVED once the SP_PUBLIC_KEY is provided.
+              It serves as a fallback payment method until Spaceremit is fully configured.
+            */}
+            <div style={{
+              borderTop: '1px solid rgba(201, 151, 46, 0.3)',
+              paddingTop: '1rem',
+              marginTop: '1rem'
+            }}>
+              <p style={{ fontSize: '0.9rem', marginBottom: '1rem', color: 'var(--text-muted)' }}>
+                {currentLang === 'ar' ? 'أو ادفعي عبر USDT:' : 'Or pay via USDT:'}
+              </p>
+              <div className="wallet-address" onClick={copyWallet}>
+                <span>TXrk4Y2BE2wVj9sKu8g6bF3R9nHmWv2ZxA</span>
+                <i className="fas fa-copy" style={{ position: 'absolute', top: '10px', left: '10px', color: 'var(--text-muted)' }}></i>
+              </div>
+              <div className={`copied-msg ${showCopied ? 'show' : ''}`}>COPIED TO CLIPBOARD!</div>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '1rem' }}>{t.paymentNote}</p>
+              <a
+                href="https://wa.me/966XXXXXXXXX?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85"
+                target="_blank"
+                className="btn-action"
+              >
+                <i className="fab fa-whatsapp"></i> {t.confirmPaymentText}
+              </a>
+            </div>
+          </form>
+
           <br />
           <button className="btn-close-modal" onClick={() => setShowModal(false)}>
             {t.closeModalBtn}
