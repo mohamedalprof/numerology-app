@@ -7,6 +7,8 @@ import { useState, useCallback, useEffect } from 'react'
 // ⚠️ استبدل YOUR_PUBLIC_KEY بالمفتاح العام الذي ستصلك من Spaceremit
 // ============================================
 const SP_PUBLIC_KEY = "YOUR_PUBLIC_KEY"; // ← ضع المفتاح العام هنا
+const SP_AMOUNT = 5;       // ← سعر الخدمة بالدولار
+const SP_CURRENCY = "USD"; // ← العملة
 const SP_FORM_ID = "#spaceremit-form";
 const SP_SELECT_RADIO_NAME = "sp-pay-type-radio";
 const LOCAL_METHODS_BOX_STATUS = true;
@@ -37,7 +39,7 @@ const translations = {
     compatIndexLabel: 'COMPATIBILITY INDEX',
     closingPhrase: 'ودائماً نقول العلم عند الله وحده، أتمنى لكم حياة مليئة بالوُد و الإحترام.',
     paywallText: 'كيف تعالجون علاقتكم؟ وكيف عملت الخوارزمية؟ افتحوا القسم المميز!',
-    subscribeBtnText: 'اكشفي السر مقابل 2$',
+    subscribeBtnText: 'اكشفي السر مقابل 5$',
     calcTabBtn: 'طريقة الحساب',
     healTabBtn: 'دليل الشفاء العاطفي 🌿',
     shareBtn: 'مشاركة النتيجة',
@@ -79,7 +81,7 @@ const translations = {
     compatIndexLabel: 'COMPATIBILITY INDEX',
     closingPhrase: 'Remember, knowledge belongs to God alone. We wish you a life full of affection and respect.',
     paywallText: 'How do you treat your relationship? How does the algorithm work? Unlock the premium section!',
-    subscribeBtnText: 'Reveal the Secret for $2',
+    subscribeBtnText: 'Reveal the Secret for $5',
     calcTabBtn: 'Calculation Method',
     healTabBtn: 'Emotional Healing Guide 🌿',
     shareBtn: 'Share Result',
@@ -590,6 +592,10 @@ export default function Home() {
               When SP_PUBLIC_KEY is set, it will show Spaceremit payment options.
               ============================================ */}
           <form id="spaceremit-form" style={{ width: '100%' }}>
+            {/* Spaceremit: Price & Currency (hidden fields) */}
+            <input type="hidden" name="amount" value={SP_AMOUNT} />
+            <input type="hidden" name="currency" value={SP_CURRENCY} />
+
             {/* Spaceremit Local Payment Methods Container */}
             <div id="spaceremit-local-methods-pay" style={{ marginBottom: '1rem' }}></div>
 
