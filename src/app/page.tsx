@@ -1,0 +1,488 @@
+'use client'
+
+import { useState, useCallback } from 'react'
+
+const translations = {
+  ar: {
+    langToggle: 'English',
+    brandName: 'أعداد وبصيرة',
+    brandSub: 'AI Numerical Insight',
+    heroTitle: 'هل نحن مناسبون لبعضنا البعض؟',
+    heroDesc: 'دعي خوارزميات <span class="highlight-cyan">الذكاء الاصطناعي</span> تحلل طاقة الأرقام القديمة. أدخلي تواريخ الميلاد <span class="highlight-amber">بدون أصفار</span> واتركي البصيرة الرقمية تكشف الغيب.',
+    user1Label: 'USER 01',
+    user1Icon: '♀',
+    user2Label: 'USER 02',
+    user2Icon: '♂',
+    dobLabel: 'DATE OF BIRTH',
+    name1Placeholder: 'اسمكِ',
+    name2Placeholder: 'اسم شريككِ',
+    dayPlaceholder: 'يوم',
+    monthPlaceholder: 'شهر',
+    yearPlaceholder: 'سنة',
+    calcBtnText: 'بدء التحليل الآلي',
+    compatIndexLabel: 'COMPATIBILITY INDEX',
+    closingPhrase: 'ودائماً نقول العلم عند الله وحده، أتمنى لكم حياة مليئة بالوُد و الإحترام.',
+    paywallText: 'كيف تعالجون علاقتكم؟ وكيف عملت الخوارزمية؟ افتحوا القسم المميز!',
+    subscribeBtnText: 'اكشفي السر مقابل 2$ USDT',
+    calcTabBtn: 'طريقة الحساب',
+    healTabBtn: 'دليل الشفاء العاطفي 🌿',
+    shareBtn: 'مشاركة النتيجة',
+    paymentTitle: 'اشتراك البصيرة السرية',
+    paymentDesc: 'لفتح قسم "طريقة الحساب" و"دليل الشفاء العاطفي"، يرجى تحويل 2$ USDT إلى:',
+    paymentNote: 'بعد التحويل، اضغطي الزر أدناه وأرسلي إثبات الدفع عبر الواتساب ليتم فتح القسم لكِ فوراً.',
+    confirmPaymentText: 'لقد قمت بالتحويل',
+    closeModalBtn: 'إغلاق',
+    waTooltip: 'تواصل معنا',
+    alertFillFields: 'يرجى ملء جميع الحقول',
+    namesSeparator: 'و',
+    positiveBadge: '✓ توافق إيجابي',
+    mediumBadge: '⚠ توافق متوسط',
+    negativeBadge: '✗ توافق سلبي',
+    shareText: (name1: string, name2: string, result: number) =>
+      `أنا و ${name2} لدينا مؤشر توافق ${result} 💕 جرب أنت أيضاً على أعداد وبصيرة!`,
+  },
+  en: {
+    langToggle: 'العربية',
+    brandName: 'Numbers & Insight',
+    brandSub: 'AI Numerology Calculator',
+    heroTitle: 'Are We Compatible?',
+    heroDesc: 'Let <span class="highlight-cyan">Artificial Intelligence</span> analyze the energy of ancient numbers. Enter your birth dates <span class="highlight-amber">without zeros</span> and let numerical insight reveal the truth.',
+    user1Label: 'USER 01',
+    user1Icon: '♀',
+    user2Label: 'USER 02',
+    user2Icon: '♂',
+    dobLabel: 'DATE OF BIRTH',
+    name1Placeholder: 'Your Name',
+    name2Placeholder: "Partner's Name",
+    dayPlaceholder: 'Day',
+    monthPlaceholder: 'Month',
+    yearPlaceholder: 'Year',
+    calcBtnText: 'Start Automated Analysis',
+    compatIndexLabel: 'COMPATIBILITY INDEX',
+    closingPhrase: 'Remember, knowledge belongs to God alone. We wish you a life full of affection and respect.',
+    paywallText: 'How do you treat your relationship? How does the algorithm work? Unlock the premium section!',
+    subscribeBtnText: 'Reveal the Secret for $2 USDT',
+    calcTabBtn: 'Calculation Method',
+    healTabBtn: 'Emotional Healing Guide 🌿',
+    shareBtn: 'Share Result',
+    paymentTitle: 'Secret Insight Subscription',
+    paymentDesc: 'To unlock "Calculation Method" and "Emotional Healing Guide", please transfer $2 USDT to:',
+    paymentNote: 'After transfer, click the button below and send proof of payment via WhatsApp to unlock the section immediately.',
+    confirmPaymentText: 'I Have Transferred',
+    closeModalBtn: 'Close',
+    waTooltip: 'Contact Us',
+    alertFillFields: 'Please fill all fields',
+    namesSeparator: '&',
+    positiveBadge: '✓ Positive Compatibility',
+    mediumBadge: '⚠ Moderate Compatibility',
+    negativeBadge: '✗ Negative Compatibility',
+    shareText: (name1: string, name2: string, result: number) =>
+      `${name1} and ${name2} have a compatibility index of ${result} 💕 Try it too on Numbers & Insight!`,
+  }
+}
+
+const interpretations: Record<number, string> = {
+  1: "في مثل هذه العلاقة ستكون دائماً مسألة القيادة على شخص ما، عادة سيسعى لإدارة العلاقة، لفرض إرادتهم وقوانينهم. حاولي ألا تتدخلي في هذا الأمر، ما هو جيد يكون: الإبداع، المثير للاهتمام، الكثير يعتمد على موقف الشركاء، الكثير يمكن أن يتغير.",
+  2: "علاقة لينة ومتناغمة القربابة، هل أنتِ في لمحة فهم بعضنا البعض. كل من الشركاء في العالم الغني، وهو خيال قوي. هذا هو موقف موات للغاية.",
+  3: "علاقة جيدة، والتي غالباً ما تؤدي إلى الزواج، قد يكون ولادة طفل. العلاقات التي تجلب المال والاستقرار. ومع ذلك، لا تدعي الأشخاص الآخرين بالتدخل في حياتك، وخاصة الأم، سوف يلعب هذا التحالف دوراً رئيسياً.",
+  4: "العلاقة، التي يلعب فيها الدور الرئيسي من قبل رجل، الكثير من العواطف. لا تدعي الغيرة تدمر كل شيء، هل تريدين امتلاك مفضلتك بالكامل، وهذا هو الأنانية، لا تدعي القيل والقال تدمر الاتحاد الخاص بك.",
+  5: "تحالف مهم في حياتك. هذا الشخص سيلعب دوراً هاماً. يمكن أن تتداخل مع الاختلافات الاجتماعية، أو اختلاف الاهتمامات، ووجهات النظر في الحياة، سيكون شريكك معلمك ومستشارك. أو سوف تصبح نجماً إرشادياً.",
+  6: "الأكثر انسجاماً من جميع النقابات. هذا هو أقل الزيجات. الحب المتبادل والوئام والسلام. ومع ذلك، قد يكون من الصعب في البداية فهم كل منهما للآخر بشكل كامل لا تقلق، كل شيء يأتي مع الوقت.",
+  7: "علاقة مؤثرة جداً، الكثير من التغيير، السفر، التواصل. الكثير من التقلبات. قد يكون هناك غش، عادة ما تنتهي هذه العلاقات بسرعة. خذي وقتك في اتخاذ قرارات مهمة حول حبيبك، لأن هناك فرصة كبيرة للخطأ.",
+  8: "هو تحالف تجاري وليس حباً، أو - العلاقات الكرمية. في الحياة الماضية كنتما مذنببن إتجاه بعضكم البعض. في هذه الحياة عليكِ أن تعملي على إصلاح أخطائك، مثل هذه العلاقات يصعب كسرها. علينا أن نعمل على أنفسنا، ليس من الضروري تغيير الشريك.",
+  9: "العلاقة المعقدة - كل وحدة على حدى. قد تشعر بالوحدة في هذا الاتحاد. عدم المودة والانتباه والدفيء هذا التحالف يتفكك في نهاية المطاف، وهو أيضاً حب في اتجاه واحد تحب وأنتِ لا! أو العكس.",
+  10: "علاقة سعيدة جداً. وسوف تجلب النجاح والحظ السعيد. أرسل هذا الإنسان إلى حياتك كحبل نجاة، انه يوسع آفاق قدرتك، قد تكون هذه أيضاً علاقة ملائمة. على أية حال، سوف ينتهي كل شيء بشكل جيد.",
+  11: "العلاقة المعقدة. كلا الشريكين هما شخصية قوية للغاية. الجميع يحاول الهيمنة. ومن هنا النزاع والشقاق، يمكن أن تتداخل مع طرف ثالث. خيانة. تحتاجين إلى التكيف مع بعضها البعض، لتقديم تنازلات، وإلا فإن العلاقة تنهار، جيداً جداً التوافق في الجنس.",
+  12: "سوف تذهب جهداً كبيراً من أجل العلاقة. إنها دائماً تضحية، يمكنك وضع الكثير بسبب حبك، هذه علاقات معقدة، كرمية، مشاعر غير متكررة، استياء، سوء فهم، هذه العلاقات ستترك انطباعاً عميقاً في ذهنك.",
+  13: "الاتحاد سيء، عاجلاً أم آجلاً سوف ينهار مثل بيت بطاقات - هناك عدم توافق في الطاقة بين الشركاء. علاقة خطرة. ممكن العنف في الزواج.",
+  14: "علاقات هادئة وسلسة، هذا هو واحد من أفضل الخيارات للتوافق، أنتِ تفهمين بعضكما البعض، لديكما أهداف مشتركة ومصالح مشتركة، علاقة طويلة ومستقرة.",
+  15: "خطر! مثل هذا التحالف مبني على التلاعب والابتزاز. شخص ما ربط الآخر من الشركاء. إدمان جنسي قوي. تحريف. السحر الأسود، تلاعب!",
+  16: "حاولي عدم ربط الحياة مع هذا الرجل. علاقات غير مستقرة للغائية، ثابت الشتائم، الشجار. النتيجة = الطلاق، أنتِ غير مناسبة لكل دائرة، نسبة المخاطر لكلا الشريكين. يمكن أن تكون عالية.",
+  17: "علاقة جيدة جداً، إذا كان كلا الشريكين يعملان على أنفسهما. الحب والاحترام والفهم المتبادل. يمكن أن يكون هناك بعض سوء الفهم في البداية، لكن مع الوقت كل شيء سوف يتحسن.",
+  18: "علاقة معقدة جداً، مليئة بالتحديات والاختبارات. قد يكون هناك الكثير من الدراما والعواطف. لكن إذا كان كلا الشريكين ملتزماً، يمكن أن تصبح علاقة قوية وعميقة.",
+  19: "علاقة روحية عميقة، هناك فهم متبادل على مستوى أعمق. قد تشعر أنكما تعرفان بعضكما منذ الأزل. علاقة مميزة جداً.",
+  20: "علاقة متوازنة وسعيدة. كلا الشريكين يشعران بالرضا والسعادة. هذا هو واحد من أفضل مؤشرات التوافق.",
+  21: "علاقة مثالية تقريباً. كل شيء يسير بسلاسة. الحب والفهم والاحترام المتبادل. هذا هو الحلم الذي يصبح حقيقة."
+}
+
+const healingGuides: Record<number, string> = {
+  1: "لتحسين هذه العلاقة، ركزي على الاستماع الفعال وفهم احتياجات شريكك. تجنبي محاولة السيطرة والسماح له بمساحة للتعبير عن ذاته.",
+  2: "استمتعي بهدوء هذه العلاقة. ركزي على بناء الثقة والتواصل الصادق. هذه العلاقة تحتاج إلى الرعاية والاهتمام المستمر.",
+  3: "احتفلي بهذا التوافق الرائع. ركزي على بناء مستقبل مشترك. تجنبي تدخل الآخرين في حياتكما الخاصة.",
+  4: "تعاملي مع الغيرة بحكمة. ركزي على بناء الثقة والأمان في العلاقة. اعطي شريكك الحرية والاستقلالية.",
+  5: "تعلمي من هذه العلاقة. اقبلي الاختلافات وركزي على النقاط المشتركة. هذا الشخص سيساعدك على النمو والتطور.",
+  6: "استمتعي بهذا الانسجام الرائع. ركزي على تعميق الحب والفهم المتبادل. هذه العلاقة ستستمر وتزدهر.",
+  7: "كوني حذرة من التقلبات. ركزي على الاستقرار والتواصل الصادق. لا تسرعي في اتخاذ القرارات المهمة.",
+  8: "اعملي على نفسك وعلى العلاقة. هذه علاقة كرمية تحتاج إلى الصبر والفهم. ركزي على الشفاء والنمو الروحي.",
+  9: "ركزي على الاتصال العاطفي. حاولي فهم احتياجات شريكك. قد تحتاجين إلى طلب المساعدة من متخصص.",
+  10: "استمتعي بهذا الحظ السعيد. ركزي على تعميق الحب والفهم المتبادل. هذه العلاقة ستجلب السعادة والنجاح.",
+  11: "تعاملي مع الصراعات بحكمة. ركزي على التواصل والتفاهم المتبادل. قد تحتاجين إلى طلب المساعدة من متخصص.",
+  12: "كوني صبورة وقوية. هذه العلاقة تحتاج إلى الكثير من الجهد والتضحية. ركزي على الحب والالتزام.",
+  13: "كوني حذرة جداً. قد تحتاجين إلى إعادة النظر في هذه العلاقة. اطلبي المساعدة والدعم من الأشخاص الموثوقين.",
+  14: "استمتعي بهذا الاستقرار والسلام. ركزي على بناء حياة مشتركة سعيدة. هذه العلاقة ستستمر وتزدهر.",
+  15: "كوني حذرة جداً من التلاعب والابتزاز. اطلبي المساعدة الفورية من متخصص أو من الأشخاص الموثوقين.",
+  16: "أعيدي النظر في هذه العلاقة بجدية. قد يكون من الأفضل الانفصال والبحث عن شريك أكثر توافقاً.",
+  17: "ركزي على العمل على نفسك وعلى العلاقة. هذه علاقة واعدة إذا كان كلا الشريكين ملتزماً.",
+  18: "كوني صبورة وقوية. هذه العلاقة تحتاج إلى الكثير من الجهد والالتزام. ركزي على الحب والفهم المتبادل.",
+  19: "احتفلي بهذا الاتصال الروحي العميق. ركزي على تعميق الحب والفهم المتبادل. هذه علاقة مميزة جداً.",
+  20: "استمتعي بهذا التوازن والسعادة. ركزي على الحفاظ على هذا الانسجام. هذه العلاقة ستستمر وتزدهر.",
+  21: "احتفلي بهذا الحب المثالي. ركزي على الحفاظ على هذا الانسجام والسعادة. هذه علاقة نادرة وخاصة جداً."
+}
+
+export default function Home() {
+  const [currentLang, setCurrentLang] = useState<'ar' | 'en'>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('lang') as 'ar' | 'en') || 'ar'
+    }
+    return 'ar'
+  })
+  const [name1, setName1] = useState('')
+  const [name2, setName2] = useState('')
+  const [day1, setDay1] = useState('')
+  const [month1, setMonth1] = useState('')
+  const [year1, setYear1] = useState('')
+  const [day2, setDay2] = useState('')
+  const [month2, setMonth2] = useState('')
+  const [year2, setYear2] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [showResult, setShowResult] = useState(false)
+  const [resultNumber, setResultNumber] = useState(0)
+  const [activeTab, setActiveTab] = useState<'calc' | 'heal'>('calc')
+  const [showModal, setShowModal] = useState(false)
+  const [showCopied, setShowCopied] = useState(false)
+  const [premiumUnlocked, setPremiumUnlocked] = useState(false)
+
+  const t = translations[currentLang]
+
+  const toggleLanguage = useCallback(() => {
+    const newLang = currentLang === 'ar' ? 'en' : 'ar'
+    setCurrentLang(newLang)
+    localStorage.setItem('lang', newLang)
+    const html = document.documentElement
+    html.setAttribute('lang', newLang)
+    html.setAttribute('dir', newLang === 'ar' ? 'rtl' : 'ltr')
+  }, [currentLang])
+
+  const sumDigits = (num: number): number => {
+    return String(num).split('').reduce((sum, digit) => sum + parseInt(digit), 0)
+  }
+
+  const reduceNumber = (num: number): number => {
+    while (num >= 22) {
+      num -= 22
+    }
+    return num
+  }
+
+  const getCategory = (compatibility: number) => {
+    if (compatibility <= 6) return 'positive'
+    if (compatibility <= 13) return 'medium'
+    return 'negative'
+  }
+
+  const getBadgeText = (category: string) => {
+    if (category === 'positive') return t.positiveBadge
+    if (category === 'medium') return t.mediumBadge
+    return t.negativeBadge
+  }
+
+  const calculateCompatibility = useCallback(() => {
+    const d1 = parseInt(day1) || 0
+    const m1 = parseInt(month1) || 0
+    const y1 = parseInt(year1) || 0
+    const d2 = parseInt(day2) || 0
+    const m2 = parseInt(month2) || 0
+    const y2 = parseInt(year2) || 0
+
+    if (!name1 || !d1 || !m1 || !y1 || !name2 || !d2 || !m2 || !y2) {
+      alert(t.alertFillFields)
+      return
+    }
+
+    setLoading(true)
+
+    setTimeout(() => {
+      const sum1 = sumDigits(d1) + sumDigits(m1) + sumDigits(y1)
+      const sum2 = sumDigits(d2) + sumDigits(m2) + sumDigits(y2)
+      const totalSum = sum1 + sum2
+      const compatibility = reduceNumber(totalSum)
+
+      setResultNumber(compatibility)
+      setShowResult(true)
+      setLoading(false)
+    }, 1500)
+  }, [name1, name2, day1, month1, year1, day2, month2, year2, t])
+
+  const copyWallet = useCallback(() => {
+    navigator.clipboard.writeText('TXrk4Y2BE2wVj9sKu8g6bF3R9nHmWv2ZxA')
+    setShowCopied(true)
+    setTimeout(() => setShowCopied(false), 2000)
+  }, [])
+
+  const shareResult = useCallback(() => {
+    const text = t.shareText(name1, name2, resultNumber)
+    if (navigator.share) {
+      navigator.share({
+        title: currentLang === 'ar' ? 'أعداد وبصيرة' : 'Numbers & Insight',
+        text: text,
+        url: window.location.href
+      })
+    } else {
+      alert(text)
+    }
+  }, [t, name1, name2, resultNumber, currentLang])
+
+  const category = getCategory(resultNumber)
+  const badgeText = getBadgeText(category)
+
+  return (
+    <>
+      {/* Background */}
+      <div className="bg-animation">
+        <div className="digital-grid"></div>
+        <div className="stars"></div>
+      </div>
+
+      {/* Language Toggle */}
+      <button className="language-toggle" onClick={toggleLanguage}>
+        {t.langToggle}
+      </button>
+
+      {/* WhatsApp Float */}
+      <a
+        href="https://wa.me/966XXXXXXXXX?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85"
+        target="_blank"
+        className="whatsapp-float"
+      >
+        <i className="fab fa-whatsapp"></i>
+        <span className="whatsapp-tooltip">{t.waTooltip}</span>
+      </a>
+
+      {/* Navbar */}
+      <nav>
+        <div className="logo-container">
+          <div className="logo-icon">
+            <div className="logo-circle">
+              <span className="logo-number">22</span>
+            </div>
+          </div>
+          <div className="brand-name">
+            {currentLang === 'ar' ? (
+              <span>أعداد وبصيرة</span>
+            ) : (
+              <span style={{ fontFamily: "'Orbitron', sans-serif" }}>Numbers & Insight</span>
+            )}
+          </div>
+          <div className="brand-name-en">
+            {currentLang === 'ar' ? 'AI Numerical Insight' : 'AI Numerology Calculator'}
+          </div>
+        </div>
+      </nav>
+
+      {/* Main Content */}
+      <main>
+        <div className="hero">
+          <h1>{t.heroTitle}</h1>
+          <p dangerouslySetInnerHTML={{ __html: t.heroDesc }} />
+        </div>
+
+        <div className="calculator-box">
+          {/* Person 1 */}
+          <div className="person-inputs">
+            <div className="input-group">
+              <label>
+                <i className="fas fa-female"></i> {t.user1Label}
+              </label>
+              <input
+                type="text"
+                value={name1}
+                onChange={(e) => setName1(e.target.value)}
+                placeholder={t.name1Placeholder}
+              />
+            </div>
+            <div className="input-group">
+              <label>{t.dobLabel}</label>
+              <div className="input-row">
+                <input
+                  type="number"
+                  value={day1}
+                  onChange={(e) => setDay1(e.target.value)}
+                  placeholder={t.dayPlaceholder}
+                  min={1}
+                  max={31}
+                />
+                <input
+                  type="number"
+                  value={month1}
+                  onChange={(e) => setMonth1(e.target.value)}
+                  placeholder={t.monthPlaceholder}
+                  min={1}
+                  max={12}
+                />
+                <input
+                  type="number"
+                  value={year1}
+                  onChange={(e) => setYear1(e.target.value)}
+                  placeholder={t.yearPlaceholder}
+                  min={1940}
+                  max={2010}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Person 2 */}
+          <div className="person-inputs" style={{ borderBottom: 'none', marginBottom: 0, paddingBottom: 0 }}>
+            <div className="input-group">
+              <label>
+                <i className="fas fa-male"></i> {t.user2Label}
+              </label>
+              <input
+                type="text"
+                value={name2}
+                onChange={(e) => setName2(e.target.value)}
+                placeholder={t.name2Placeholder}
+              />
+            </div>
+            <div className="input-group">
+              <label>{t.dobLabel}</label>
+              <div className="input-row">
+                <input
+                  type="number"
+                  value={day2}
+                  onChange={(e) => setDay2(e.target.value)}
+                  placeholder={t.dayPlaceholder}
+                  min={1}
+                  max={31}
+                />
+                <input
+                  type="number"
+                  value={month2}
+                  onChange={(e) => setMonth2(e.target.value)}
+                  placeholder={t.monthPlaceholder}
+                  min={1}
+                  max={12}
+                />
+                <input
+                  type="number"
+                  value={year2}
+                  onChange={(e) => setYear2(e.target.value)}
+                  placeholder={t.yearPlaceholder}
+                  min={1940}
+                  max={2010}
+                />
+              </div>
+            </div>
+          </div>
+
+          <button
+            className={`btn-calculate ${loading ? 'loading' : ''}`}
+            onClick={calculateCompatibility}
+          >
+            {t.calcBtnText} <i className="fas fa-microchip"></i>
+            <div className="spinner"></div>
+          </button>
+        </div>
+
+        {/* Results */}
+        {showResult && (
+          <div className="result-section">
+            <div className="result-card">
+              <div className="scan-line"></div>
+              <div className="result-content">
+                <div className="names-display">
+                  {name1} {t.namesSeparator} {name2}
+                </div>
+                <div className="compat-index-label">{t.compatIndexLabel}</div>
+                <div className="compatibility-number">{resultNumber}</div>
+                <div className={`category-badge cat-${category}`}>{badgeText}</div>
+                <div className="interpretation-text">
+                  {interpretations[resultNumber] || 'نتيجة غير متوقعة'}
+                </div>
+                <div className="closing-phrase">{t.closingPhrase}</div>
+
+                {/* Premium Section */}
+                <div className={`paywall-section ${premiumUnlocked ? 'premium-unlocked' : ''}`}>
+                  {!premiumUnlocked && (
+                    <div className="paywall-overlay">
+                      <i className="fas fa-lock lock-icon"></i>
+                      <div className="paywall-text">{t.paywallText}</div>
+                      <button className="btn-subscribe" onClick={() => setShowModal(true)}>
+                        {t.subscribeBtnText}
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="paywall-content">
+                    <div className="tabs">
+                      <button
+                        className={`tab-btn ${activeTab === 'calc' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('calc')}
+                      >
+                        {t.calcTabBtn}
+                      </button>
+                      <button
+                        className={`tab-btn ${activeTab === 'heal' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('heal')}
+                      >
+                        {t.healTabBtn}
+                      </button>
+                    </div>
+
+                    <div className={`tab-content ${activeTab === 'calc' ? 'active' : ''}`}>
+                      <p><strong>الخطوة 1:</strong> نقوم بجمع كل أرقام تواريخ الميلاد معاً (بدون أصفار).</p>
+                      <p>مثال: 1+2+9+1+9+7+0+2+1+2+1+9+6+8 = 58</p>
+                      <br />
+                      <p><strong>الخطوة 2:</strong> نقوم بطرح الرقم 22 بشكل متكرر حتى نحصل على رقم أقل من 22.</p>
+                      <p>مثال: 58 - 22 = 36<br />36 - 22 = 14</p>
+                      <br />
+                      <p><strong>النتيجة:</strong> الرقم النهائي (14) هو مؤشر التوافق الخاص بكما!</p>
+                    </div>
+
+                    <div className={`tab-content ${activeTab === 'heal' ? 'active' : ''}`}>
+                      <p>{healingGuides[resultNumber] || 'نصيحة غير متوفرة'}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <button className="btn-share" onClick={shareResult}>
+                  <i className="fas fa-share-alt"></i> {t.shareBtn}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* Payment Modal */}
+      <div className={`modal-bg ${showModal ? 'active' : ''}`} onClick={(e) => {
+        if (e.target === e.currentTarget) setShowModal(false)
+      }}>
+        <div className="modal-content">
+          <h3 style={{ color: 'var(--amber)', marginBottom: '1rem' }}>{t.paymentTitle}</h3>
+          <p style={{ fontSize: '0.9rem', marginBottom: '1.5rem' }}>{t.paymentDesc}</p>
+
+          <div className="wallet-address" onClick={copyWallet}>
+            <span>TXrk4Y2BE2wVj9sKu8g6bF3R9nHmWv2ZxA</span>
+            <i className="fas fa-copy" style={{ position: 'absolute', top: '10px', left: '10px', color: 'var(--text-muted)' }}></i>
+          </div>
+          <div className={`copied-msg ${showCopied ? 'show' : ''}`}>COPIED TO CLIPBOARD!</div>
+
+          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '1rem' }}>{t.paymentNote}</p>
+
+          <a
+            href="https://wa.me/966XXXXXXXXX?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85"
+            target="_blank"
+            className="btn-action"
+          >
+            <i className="fab fa-whatsapp"></i> {t.confirmPaymentText}
+          </a>
+          <br />
+          <button className="btn-close-modal" onClick={() => setShowModal(false)}>
+            {t.closeModalBtn}
+          </button>
+        </div>
+      </div>
+    </>
+  )
+}
