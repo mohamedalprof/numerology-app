@@ -1,0 +1,47 @@
+[
+  {
+    "url": "https://spaceremit.com/apiinfo",
+    "name": "للمطورين - Spaceremit",
+    "snippet": "<script src=\"https://spaceremit.com/api/v2/js_script/spaceremit.js\" ></script><!-- Script tag to include Spaceremit JavaScript library -->.\nThis HTML script tag imports Spaceremit's JavaScript library into your website's frontend, enabling seamless integration of Spaceremit's payment gateway functionality.",
+    "host_name": "spaceremit.com",
+    "rank": 0,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://github.com/SpaceremitFiles/Javascript/blob/main/pay-form.html",
+    "name": "Javascript/pay-form.html at main · SpaceremitFiles/Javascript",
+    "snippet": "Contribute to SpaceremitFiles/Javascript development by creating an account on GitHub.",
+    "host_name": "github.com",
+    "rank": 1,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Security-Policy/script-src",
+    "name": "Content-Security-Policy: script-src directive - HTTP | MDN",
+    "snippet": "The HTTP Content-Security-Policy (CSP) script-src directive specifies valid sources for JavaScript. This includes not only URLs loaded directly into <script> elements, but also things like inline script event handlers (onclick) and XSLT stylesheets which can trigger script execution.",
+    "host_name": "developer.mozilla.org",
+    "rank": 2,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.w3schools.com/TAGS/att_script_src.asp",
+    "name": "HTML script src Attribute - W3Schools",
+    "snippet": "The src attribute specifies the URL of an external script file. If you want to run the same JavaScript on several pages in a web site, you should create an external JavaScript file, instead of writing the same script over and over again.",
+    "host_name": "www.w3schools.com",
+    "rank": 3,
+    "date": "",
+    "favicon": ""
+  },
+  {
+    "url": "https://www.spaceremit.com/apipay",
+    "name": "Spaceremit -Api Pay",
+    "snippet": "Transitioned to API Version 2 for faster performance, improved security, and enhanced payment management features. The new version allows easier integration of future payment methods and additional features.",
+    "host_name": "www.spaceremit.com",
+    "rank": 4,
+    "date": "",
+    "favicon": ""
+  }
+]
