@@ -6,9 +6,9 @@ import { useState, useCallback, useEffect } from 'react'
 // 🔑 SPACEREMIT CONFIGURATION
 // ⚠️ استبدل YOUR_PUBLIC_KEY بالمفتاح العام الذي ستصلك من Spaceremit
 // ============================================
-const SP_PUBLIC_KEY = "YOUR_PUBLIC_KEY"; // ← ضع المفتاح العام هنا
-const SP_AMOUNT = 5;       // ← سعر الخدمة بالدولار
-const SP_CURRENCY = "USD"; // ← العملة
+const SP_PUBLIC_KEY = process.env.NEXT_PUBLIC_SPACEREMIT_PUBLIC_KEY || "YOUR_PUBLIC_KEY"; // ← يُقرأ من متغيرات البيئة
+const SP_AMOUNT = Number(process.env.NEXT_PUBLIC_SPACEREMIT_AMOUNT || "5"); // ← سعر الخدمة بالدولار
+const SP_CURRENCY = process.env.NEXT_PUBLIC_SPACEREMIT_CURRENCY || "USD"; // ← العملة
 const SP_FORM_ID = "#spaceremit-form";
 const SP_SELECT_RADIO_NAME = "sp-pay-type-radio";
 const LOCAL_METHODS_BOX_STATUS = true;
