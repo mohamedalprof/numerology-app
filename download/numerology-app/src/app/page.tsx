@@ -49,7 +49,6 @@ const translations = {
     paymentNote: 'بعد الدفع، سيتم فتح القسم المميز لكِ تلقائياً.',
     confirmPaymentText: 'لقد قمت بالدفع',
     closeModalBtn: 'إغلاق',
-    waTooltip: 'تواصل معنا',
     alertFillFields: 'يرجى ملء جميع الحقول',
     namesSeparator: 'و',
     positiveBadge: '✓ توافق إيجابي',
@@ -91,7 +90,6 @@ const translations = {
     paymentNote: 'After payment, the premium section will be unlocked automatically.',
     confirmPaymentText: 'I Have Paid',
     closeModalBtn: 'Close',
-    waTooltip: 'Contact Us',
     alertFillFields: 'Please fill all fields',
     namesSeparator: '&',
     positiveBadge: '✓ Positive Compatibility',
@@ -355,16 +353,6 @@ export default function Home() {
       <button className="language-toggle" onClick={toggleLanguage}>
         {t.langToggle}
       </button>
-
-      {/* WhatsApp Float */}
-      <a
-        href="https://wa.me/966XXXXXXXXX?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85"
-        target="_blank"
-        className="whatsapp-float"
-      >
-        <i className="fab fa-whatsapp"></i>
-        <span className="whatsapp-tooltip">{t.waTooltip}</span>
-      </a>
 
       {/* Navbar */}
       <nav>
