@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     // 2. Verify the Secret Key
     // This ensures the callback is genuinely from Spaceremit
     // ============================================
-    const expectedSecretKey = process.env.SPACEREMIT_SECRET_KEY;
+    const expectedSecretKey = process.env.SPACEREMIT_SECRET_KEY || "skBIMC3KYVZ07V99YJYA7RYIBOS70MYUZ7OM09FE91IIHQ8E8EP1";
 
     if (!expectedSecretKey) {
       console.error("❌ SPACEREMIT_SECRET_KEY not configured in environment variables");
