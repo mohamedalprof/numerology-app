@@ -230,6 +230,22 @@ export default function Home() {
     window.SP_NEED_AUTH = (target_auth_link: string) => {
       window.open(target_auth_link, '_blank')
     }
+
+    // Initialize Spaceremit SDK after it loads
+    const initSpaceremit = () => {
+      if (typeof (window as any).SpaceremitPay === 'function') {
+        try {
+          ;(window as any).SpaceremitPay()
+          console.log('Spaceremit SDK initialized successfully')
+        } catch (e) {
+          console.log('Spaceremit init error:', e)
+        }
+      } else {
+        // Retry until SDK is loaded
+        setTimeout(initSpaceremit, 1000)
+      }
+    }
+    setTimeout(initSpaceremit, 2000)
   }, [])
 
   const toggleLanguage = useCallback(() => {

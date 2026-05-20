@@ -214,9 +214,9 @@ input:focus { outline: none; border-color: var(--neon-cyan); box-shadow: 0 0 15p
 }
 .btn-share:hover { border-color: var(--neon-cyan); color: var(--neon-cyan); }
 
-/* Modal */
-.modal-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; justify-content: center; align-items: center; }
-.modal-bg.active { display: flex; }
+/* Modal - using visibility instead of display:none so Spaceremit SDK can initialize properly */
+.modal-bg { visibility: hidden; opacity: 0; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; justify-content: center; align-items: center; transition: opacity 0.3s; pointer-events: none; }
+.modal-bg.active { visibility: visible; opacity: 1; pointer-events: auto; }
 .modal-content {
   background: var(--forest-dark); border: 1px solid var(--amber); border-radius: 10px; padding: 2rem;
   width: 90%; max-width: 400px; text-align: center; box-shadow: 0 0 30px rgba(201, 151, 46, 0.2);
