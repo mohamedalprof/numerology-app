@@ -7,7 +7,7 @@ import { sumDigits, reduceNumber, getCategory, POSITIVE_NUMBERS, NEGATIVE_NUMBER
 // 🔑 SPACEREMIT CONFIGURATION
 // ⚠️ استبدل YOUR_PUBLIC_KEY بالمفتاح العام الذي ستصلك من Spaceremit
 // ============================================
-const SP_PUBLIC_KEY = "pkY0983WL196EGJHJ05WM06ORG6EXFTNZ1RHI543ZEQBCSO33XAX"; // ← مفتاح Spaceremit العام لموقع Numerology App
+const SP_PUBLIC_KEY = "test_pkEWKABMA8ACO5SWCQ6CF64M9ILOVDEZGDXOOFM82MZSKYGN90BZ"; // ← مفتاح Spaceremit التجريبي (Test Mode)
 const SP_AMOUNT = Number(process.env.NEXT_PUBLIC_SPACEREMIT_AMOUNT || "5"); // ← سعر الخدمة بالدولار
 const SP_CURRENCY = process.env.NEXT_PUBLIC_SPACEREMIT_CURRENCY || "USD"; // ← العملة
 const SP_FORM_ID = "#spaceremit-form";
