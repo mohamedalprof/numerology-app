@@ -626,19 +626,67 @@ export default function Home() {
 
           {/* ============================================
               🔑 SPACEREMIT PAYMENT FORM
-              This form integrates with Spaceremit payment gateway.
-              When SP_PUBLIC_KEY is set, it will show Spaceremit payment options.
+              Following Spaceremit official documentation structure
               ============================================ */}
           <form id="spaceremit-form" style={{ width: '100%' }}>
             {/* Spaceremit: Price & Currency (hidden fields) */}
             <input type="hidden" name="amount" value={SP_AMOUNT} />
             <input type="hidden" name="currency" value={SP_CURRENCY} />
 
-            {/* Spaceremit Local Payment Methods Container */}
-            <div id="spaceremit-local-methods-pay" style={{ marginBottom: '1rem' }}></div>
+            {/* Spaceremit: Local Payment Methods Section */}
+            <div className="sp-one-type-select">
+              <input
+                type="radio"
+                name="sp-pay-type-radio"
+                value="local-methods-pay"
+                id="sp_local_methods_radio"
+                defaultChecked
+                style={{ display: 'none' }}
+              />
+              <label htmlFor="sp_local_methods_radio">
+                <div style={{ color: 'var(--neon-cyan)', fontWeight: 'bold', marginBottom: '0.5rem', fontSize: '0.95rem' }}>
+                  {currentLang === 'ar' ? '💳 طرق الدفع المحلية' : '💳 Local Payment Methods'}
+                </div>
+              </label>
+              <div id="spaceremit-local-methods-pay"></div>
+            </div>
 
-            {/* Spaceremit Card Payment Container */}
-            <div id="spaceremit-card-pay" style={{ marginBottom: '1rem' }}></div>
+            {/* Spaceremit: Card Payment Section */}
+            <div className="sp-one-type-select">
+              <input
+                type="radio"
+                name="sp-pay-type-radio"
+                value="card-pay"
+                id="sp_card_radio"
+                style={{ display: 'none' }}
+              />
+              <label htmlFor="sp_card_radio">
+                <div style={{ color: 'var(--amber)', fontWeight: 'bold', marginBottom: '0.5rem', fontSize: '0.95rem' }}>
+                  {currentLang === 'ar' ? '💳 بطاقة ائتمان' : '💳 Card Payment'}
+                </div>
+              </label>
+              <div id="spaceremit-card-pay"></div>
+            </div>
+
+            {/* Spaceremit: Submit Button */}
+            <button
+              type="submit"
+              style={{
+                width: '100%',
+                padding: '0.8rem',
+                marginTop: '1rem',
+                background: 'linear-gradient(135deg, var(--amber), #c77d00)',
+                color: '#000',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '1rem',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                fontFamily: 'Cairo, sans-serif'
+              }}
+            >
+              {currentLang === 'ar' ? 'ادفع الآن' : 'Pay Now'} 💰
+            </button>
           </form>
 
           <br />
