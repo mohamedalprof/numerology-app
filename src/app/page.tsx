@@ -7,7 +7,7 @@ import { sumDigits, reduceNumber, getCategory, POSITIVE_NUMBERS, NEGATIVE_NUMBER
 // 🔑 SPACEREMIT CONFIGURATION
 // ⚠️ استبدل YOUR_PUBLIC_KEY بالمفتاح العام الذي ستصلك من Spaceremit
 // ============================================
-const SP_PUBLIC_KEY = process.env.NEXT_PUBLIC_SPACEREMIT_PUBLIC_KEY || "YOUR_PUBLIC_KEY"; // ← يُقرأ من متغيرات البيئة
+const SP_PUBLIC_KEY = "pkY0983WL196EGJHJ05WM06ORG6EXFTNZ1RHI543ZEQBCSO33XAX"; // ← مفتاح Spaceremit العام لموقع Numerology App
 const SP_AMOUNT = Number(process.env.NEXT_PUBLIC_SPACEREMIT_AMOUNT || "5"); // ← سعر الخدمة بالدولار
 const SP_CURRENCY = process.env.NEXT_PUBLIC_SPACEREMIT_CURRENCY || "USD"; // ← العملة
 const SP_FORM_ID = "#spaceremit-form";
@@ -371,16 +371,6 @@ export default function Home() {
       <button className="language-toggle" onClick={toggleLanguage}>
         {t.langToggle}
       </button>
-
-      {/* WhatsApp Float */}
-      <a
-        href="https://wa.me/966XXXXXXXXX?text=%D8%A7%D9%84%D8%B3%D9%84%D8%A7%D9%85%20%D8%B9%D9%84%D9%8A%D9%83%D9%85"
-        target="_blank"
-        className="whatsapp-float"
-      >
-        <i className="fab fa-whatsapp"></i>
-        <span className="whatsapp-tooltip">{t.waTooltip}</span>
-      </a>
 
       {/* Navbar */}
       <nav>
