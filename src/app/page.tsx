@@ -328,16 +328,25 @@ export default function Home() {
   const handleSubscribe = useCallback(() => {
     setShowModal(true)
     // Initialize Spaceremit form when modal opens
-    // This ensures the wallet option and other payment methods render correctly
-    setTimeout(() => {
+    // Retry multiple times to ensure SDK is loaded
+    const tryInit = (attempt: number) => {
+      if (attempt > 10) {
+        console.error('Spaceremit SDK failed to load after 10 attempts')
+        return
+      }
       if (typeof window !== 'undefined' && typeof (window as any).SpaceremitPay === 'function') {
         try {
+          console.log('Initializing Spaceremit SDK, attempt:', attempt)
           ;(window as any).SpaceremitPay()
         } catch (e) {
-          console.log('Spaceremit init on modal open:', e)
+          console.log('Spaceremit init error:', e)
         }
+      } else {
+        console.log('Spaceremit SDK not loaded yet, retrying in 500ms...', attempt)
+        setTimeout(() => tryInit(attempt + 1), 500)
       }
-    }, 500)
+    }
+    setTimeout(() => tryInit(1), 300)
   }, [])
 
   const category = getCategory(resultNumber)
@@ -345,18 +354,20 @@ export default function Home() {
 
   return (
     <>
-      {/* Spaceremit Configuration Script */}
+      {/* Spaceremit Configuration Script - Using var so variables are on window object */}
       <script
         dangerouslySetInnerHTML={{
           __html: `
-            const SP_PUBLIC_KEY = "${SP_PUBLIC_KEY}";
-            const SP_FORM_ID = "${SP_FORM_ID}";
-            const SP_SELECT_RADIO_NAME = "${SP_SELECT_RADIO_NAME}";
-            const LOCAL_METHODS_BOX_STATUS = ${LOCAL_METHODS_BOX_STATUS};
-            const LOCAL_METHODS_PARENT_ID = "${LOCAL_METHODS_PARENT_ID}";
-            const CARD_BOX_STATUS = ${CARD_BOX_STATUS};
-            const CARD_BOX_PARENT_ID = "${CARD_BOX_PARENT_ID}";
-            let SP_FORM_AUTO_SUBMIT_WHEN_GET_CODE = ${SP_FORM_AUTO_SUBMIT_WHEN_GET_CODE};
+            var SP_PUBLIC_KEY = "${SP_PUBLIC_KEY}";
+            var SP_FORM_ID = "${SP_FORM_ID}";
+            var SP_SELECT_RADIO_NAME = "${SP_SELECT_RADIO_NAME}";
+            var LOCAL_METHODS_BOX_STATUS = ${LOCAL_METHODS_BOX_STATUS};
+            var LOCAL_METHODS_PARENT_ID = "${LOCAL_METHODS_PARENT_ID}";
+            var CARD_BOX_STATUS = ${CARD_BOX_STATUS};
+            var CARD_BOX_PARENT_ID = "${CARD_BOX_PARENT_ID}";
+            var SP_FORM_AUTO_SUBMIT_WHEN_GET_CODE = ${SP_FORM_AUTO_SUBMIT_WHEN_GET_CODE};
+            console.log('Spaceremit config loaded. SP_PUBLIC_KEY:', SP_PUBLIC_KEY);
+            console.log('window.SP_PUBLIC_KEY:', window.SP_PUBLIC_KEY);
           `
         }}
       />
